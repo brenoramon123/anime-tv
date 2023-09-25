@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://unpkg.com/feather-icons"></script>
+  </head>
+  <body>
+    <main class="bg-c_dark_1 flex flex-col w-screen h-screen text-c_white_1">
+      <section
+        class="w-full max-w-[1820px] mx-auto flex-1 p-8 bg-c_dark_1 text-c_white_1"
+      >
+        <div class="flex gap-4 flex-row flex-wrap w-full justify-center">
+          <header class="flex justify-start w-full">
+            <a
+              href="javascript:history.back()"
+              class="text-xl flex items-center gap-2"
+            >
+              <span>
+                <i data-feather="chevron-left" class="w-6 h-6"></i>
+              </span>
+              Voltar
+            </a>
+          </header>
+
+          <div id="player" class="w-full">
+            <!-- O vídeo de maior resolução é renderizado aqui pelo script watch.js -->
+            <!-- NÃO APAGUE O EXEMPLO DE RENDERIZAÇÃO  -->
+            <!-- Este exemplo é usado apenas localmente para carregar os estilos por classes necessários pelo tailwind porém não será exibido no site -->
+            <video controls src="" class="hidden w-5/6 h-5/6 mx-auto"></video>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script>
+      async function request(url) {
+        try {
+          const response = await fetch(url);
+          const data = await response.json();
+          return data;
+        } catch (error) {
+          console.error("Erro:", error);
+          return [];
+        }
+      }
+
+      function createPlayer(url) {
+        const player = document.createElement("video");
+        player.src = url;
+        player.controls = true;
+        player.autoplay = false;
+        player.classList.add("w-5/6", "h-5/6", "mx-auto");
+
+        return player;
+      }
+
+      async function initialize() {
+        const data = await request(
+          "https://animesvision.vercel.app/anime/player" +
+            window.location.search
+        );
+
+        const url = data["1080p"] || data["720p"] || data["480p"];
+
+        document.querySelector("#player").append(createPlayer(url));
+
+        feather.replace();
+      }
+
+      initialize();
+    </script>
+    <script>
+      feather.replace();
+    </script>
+  </body>
+</html>

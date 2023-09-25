@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+
+<body class="h-full bg-c_dark_1">
+    <main class="flex flex-col w-screen h-screen text-c_white_1">
+        <header class="w-screen flex justify-center p-4 bg-c_gray_1">
+            <input id="searchInput" type="search" placeholder="Pesquisar animes"
+                class="p-2 max-w-md w-[100%] bg-c_white_1 rounded-sm text-c_dark_1 appearance-none" />
+        </header>
+        <section class="w-[100%] max-w-[1820px] mx-auto flex-1 p-8 bg-c_dark_1 text-c_white_1">
+            <h1 class="text-4xl py-8">Resultados</h1>
+            <ul id="episodes" class="flex gap-4 flex-row flex-wrap w-full justify-center">
+                <!-- Episódios são renderizados aqui pelo script home.js -->
+                <!-- NÃO APAGUE O EXEMPLO DE RENDERIZAÇÃO  -->
+                <!-- Este exemplo é usado apenas localmente para carregar os estilos por classes necessários pelo tailwind porém não será exibido no site -->
+                <a href="#" class="group/episode hidden">
+                    <li class="w-[320px] h-[280px] relative">
+                        <div
+                            class="pointer-events-none select-none w-full h-full bg-c_dark_1/60 absolute top-0 left-0 z-5 group-hover/episode:bg-c_dark_1/40 transition-all">
+                        </div>
+                        <img src="" alt="" class="object-cover w-[100%] h-[100%]" />
+                        <span class="absolute top-4 left-2 bg-red-600 uppercase text-xs p-1 rounded-md">
+                            FULL HD
+                        </span>
+                        <header class="absolute bottom-4 left-2 right-2">
+                            <h2 class="text-md shadow-sm">Anime name</h2>
+                        </header>
+                        <i data-feather="play-circle"
+                            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-c_gray_1/60 scale-95 rounded-full p-2 group-hover/episode:scale-105 transition-all"></i>
+                    </li>
+                </a>
+            </ul>
+        </section>
+    </main>
+    <script>
+        async function request(url) {
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error("Erro:", error);
+                return [];
+            }
+        }
+
+        function createEpisodeCard(episode) {
+            const episodeCard = document.createElement("a");
+            episodeCard.href = "detalhes.html?link=" + episode?.link;
+            episodeCard.classList.add("group/episode", "overflow-hidden");
+
+            const episodeListItem = document.createElement("li");
+            episodeListItem.classList.add("w-[320px]", "h-[280px]", "relative");
+
+            const episodeBlur = document.createElement("div");
+            episodeBlur.classList.add(
+                "pointer-events-none",
+                "select-none",
+                "w-full",
+                "h-full",
+                "bg-c_dark_1/60",
+                "absolute",
+                "top-0",
+                "left-0",
+                "z-5",
+                "group-hover/episode:bg-c_dark_1/40",
+                "transition-all"
+            );
+
+            const episodeImage = document.createElement("img");
+            episodeImage.classList.add("object-cover", "w-[100%]", "h-[100%]");
+            episodeImage.src = episode?.thumbnail;
+
+            const episodeQuality = document.createElement("span");
+            episodeQuality.classList.add(
+                "absolute",
+                "top-4",
+                "left-2",
+                "bg-red-600",
+                "uppercase",
+                "text-xs",
+                "p-1",
+                "rounded-md"
+            );
+            episodeQuality.textContent = episode?.quality;
+
+            const episodeInfoHeader = document.createElement("header");
+            episodeInfoHeader.classList.add(
+                "absolute",
+                "bottom-4",
+                "left-2",
+                "right-2"
+            );
+
+            const episodeTitle = document.createElement("h2");
+            episodeTitle.classList.add("text-md", "shadow-sm");
+            episodeTitle.textContent = episode?.title;
+
+            episodeInfoHeader.appendChild(episodeTitle);
+
+            episodeListItem.appendChild(episodeBlur);
+            episodeListItem.appendChild(episodeImage);
+            episodeListItem.appendChild(episodeQuality);
+            episodeListItem.appendChild(episodeInfoHeader);
+
+            episodeCard.appendChild(episodeListItem);
+
+            return episodeCard;
+        }
+
+        async function initialize() {
+            const searchString = document.getElementById("searchInput").value;
+            const apiUrl = `https://animesvision.vercel.app/anime/search?name=${searchString}`;
+            const data = await request(apiUrl);
+
+            const episodesContainer = document.querySelector("#episodes");
+            episodesContainer.innerHTML = '';
+            episodesContainer.append(...data.map((item) => createEpisodeCard(item)));
+
+            feather.replace();
+        }
+
+        const searchInput = document.getElementById("searchInput");
+        searchInput.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                initialize();
+            }
+        });
+    </script>
+    <script>
+        feather.replace();
+    </script>
+</body>
+
+</html>
